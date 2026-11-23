@@ -71,9 +71,13 @@ class HyNumberFormat
 
 public:
 	HyNumberFormat();
+	HyNumberFormat(uint32 uiSerialized);
 	HyNumberFormat(const HyNumberFormat &copyRef);
 
 	HyNumberFormat &operator=(const HyNumberFormat &rhs);
+
+	uint32 Serialize() const;
+	void Deserialize(uint32 uiSerialized);
 
 	// Whether to show the decimal separator after integers when there are one or more digits to display
 	HyNumDecimalSeparator GetDecimalSeparator() const;
@@ -96,6 +100,10 @@ public:
 	HyNumberFormat SetRounding(HyNumFmtRounding eRounding);
 
 	// Only used when 'HYFMTROUNDING_None'. Values will clamp to [0-15]
+	int32 GetFractionPrecisionMin() const;
+	// Only used when 'HYFMTROUNDING_None'. Values will clamp to [0-15]
+	int32 GetFractionPrecisionMax() const;
+	// Only used when 'HYFMTROUNDING_None'. Values will clamp to [0-15]
 	HyNumberFormat SetFractionPrecision(int32 iMinFractionPlaces = 0, int32 iMaxFractionPlaces = 6);
 
 	// Whether to optionally use the minor fractional symbol when formatting currencies if the value is less than 1 integer unit (aka 50 cents)
@@ -113,6 +121,7 @@ public:
 	// Whether to use the currency symbol (e.g. $), otherwise it will try to use the ISO currency code (e.g. USD)
 	HyNumberFormat SetUsingCurrencySymbol(bool bUseCurrencySymbol);
 
+	int32 GetIntegerPaddingWidth() const;
 	// Minimum number of integer digits to display. Will pad with zeros.
 	// Valid values for 'iZeroPaddingPlaces' [0-127]
 	HyNumberFormat SetIntegerPaddingWidth(int32 iZeroPaddingPlaces = 1);

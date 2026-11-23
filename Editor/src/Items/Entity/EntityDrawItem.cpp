@@ -535,8 +535,6 @@ QJsonValue EntityDrawItem::ExtractPropertyData(QString sCategory, QString sPrope
 	}
 	else if(sCategory == "Label")
 	{
-		if(sPropertyName == "Set Value")
-			return QJsonValue(static_cast<HyRackMeter *>(pThisHyNode)->GetValue());
 		if(sPropertyName == "Text")
 			return QJsonValue(QString::fromUtf8(static_cast<HyLabel *>(pThisHyNode)->GetUtf8String().c_str()));
 		if(sPropertyName == "Input Validator")
@@ -555,15 +553,23 @@ QJsonValue EntityDrawItem::ExtractPropertyData(QString sCategory, QString sPrope
 			return QJsonValue(QString(HyGlobal::GetAlignmentNameList()[static_cast<HyLabel *>(pThisHyNode)->GetAlignment()]));
 		if(sPropertyName == "Monospaced Digits")
 			return QJsonValue(static_cast<HyLabel *>(pThisHyNode)->IsMonospacedDigits());
-		if(sPropertyName == "Show As Cash")
-			return QJsonValue(static_cast<HyRackMeter *>(pThisHyNode)->IsShowAsCash());
-		if(sPropertyName == "Spinning Digits")
-			return QJsonValue(static_cast<HyRackMeter *>(pThisHyNode)->IsSpinningMeter());
+		
 	}
 	else if(sCategory == "Button")
 	{
 		if(sPropertyName == "Checked")
 			return QJsonValue(static_cast<HyButton *>(pThisHyNode)->IsChecked());
+	}
+	else if(sCategory == "Rack Meter")
+	{
+		if(sPropertyName == "Set Value")
+			return QJsonValue(static_cast<HyRackMeter *>(pThisHyNode)->GetValue());
+		if(sPropertyName == "Show As Cash")
+			return QJsonValue(static_cast<HyRackMeter *>(pThisHyNode)->IsShowAsCash());
+		if(sPropertyName == "Spinning Digits")
+			return QJsonValue(static_cast<HyRackMeter *>(pThisHyNode)->IsSpinningMeter());
+		if(sPropertyName == "Number Formatting")
+			return QJsonValue(static_cast<qint64>(static_cast<HyRackMeter *>(pThisHyNode)->GetNumFormat().Serialize()));
 	}
 	else if(sCategory == "Bar Meter")
 	{
@@ -573,6 +579,8 @@ QJsonValue EntityDrawItem::ExtractPropertyData(QString sCategory, QString sPrope
 			return QJsonValue(static_cast<HyBarMeter *>(pThisHyNode)->GetMaximum());
 		if(sPropertyName == "Value")
 			return QJsonValue(static_cast<HyBarMeter *>(pThisHyNode)->GetValue());
+		if(sPropertyName == "Number Formatting")
+			return QJsonValue(static_cast<qint64>(static_cast<HyBarMeter *>(pThisHyNode)->GetNumFormat().Serialize()));
 	}
 	else if(sCategory == "Slider")
 	{
@@ -1418,8 +1426,6 @@ void ExtrapolateProperties(Project &projectRef,
 			{
 				QJsonObject labelObj = propsObj["Label"].toObject();
 
-				if(labelObj.contains("Set Value"))
-					static_cast<HyRackMeter *>(pThisHyNode)->SetValue(labelObj["Set Value"].toInt(), 0.0f);
 				if(labelObj.contains("Text"))
 					static_cast<HyLabel *>(pThisHyNode)->SetText(labelObj["Text"].toString().toStdString());
 				if(labelObj.contains("Text Item"))
@@ -1491,16 +1497,25 @@ void ExtrapolateProperties(Project &projectRef,
 					static_cast<HyLabel *>(pThisHyNode)->SetAlignment(HyGlobal::GetAlignmentFromString(labelObj["Alignment"].toString()));
 				if(labelObj.contains("Monospaced Digits"))
 					static_cast<HyLabel *>(pThisHyNode)->SetMonospacedDigits(labelObj["Monospaced Digits"].toBool());
-				if(labelObj.contains("Show As Cash"))
-					static_cast<HyRackMeter *>(pThisHyNode)->ShowAsCash(labelObj["Show As Cash"].toBool());
-				if(labelObj.contains("Spinning Digits"))
-					static_cast<HyRackMeter *>(pThisHyNode)->SetAsSpinningMeter(labelObj["Spinning Digits"].toBool());
 			}
 			if(propsObj.contains("Button"))
 			{
 				QJsonObject buttonObj = propsObj["Button"].toObject();
 				if(buttonObj.contains("Checked"))
 					static_cast<HyButton *>(pThisHyNode)->SetChecked(buttonObj["Checked"].toBool());
+			}
+			if(propsObj.contains("Rack Meter"))
+			{
+				QJsonObject rackMeterObj = propsObj["Rack Meter"].toObject();
+
+				if(rackMeterObj.contains("Set Value"))
+					static_cast<HyRackMeter *>(pThisHyNode)->SetValue(rackMeterObj["Set Value"].toInt(), 0.0f);
+				if(rackMeterObj.contains("Show As Cash"))
+					static_cast<HyRackMeter *>(pThisHyNode)->ShowAsCash(rackMeterObj["Show As Cash"].toBool());
+				if(rackMeterObj.contains("Spinning Digits"))
+					static_cast<HyRackMeter *>(pThisHyNode)->SetAsSpinningMeter(rackMeterObj["Spinning Digits"].toBool());
+				if(rackMeterObj.contains("Number Formatting"))
+					static_cast<HyRackMeter *>(pThisHyNode)->SetNumFormat(HyNumberFormat(rackMeterObj["Number Formatting"].toInteger()));
 			}
 			if(propsObj.contains("Bar Meter"))
 			{
@@ -1512,6 +1527,8 @@ void ExtrapolateProperties(Project &projectRef,
 					static_cast<HyBarMeter *>(pThisHyNode)->SetMaximum(barMeterObj["Max Value"].toInt());
 				if(barMeterObj.contains("Value"))
 					static_cast<HyBarMeter *>(pThisHyNode)->SetValue(barMeterObj["Value"].toInt(), 0.0f);
+				if(barMeterObj.contains("Number Formatting"))
+					static_cast<HyBarMeter *>(pThisHyNode)->SetNumFormat(HyNumberFormat(barMeterObj["Number Formatting"].toInteger()));
 			}
 			if(propsObj.contains("Slider"))
 			{

@@ -13,6 +13,15 @@
 
 HyRackMeter::HyRackMeter(HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(pParent),
+	m_iCurValue(0),
+	m_iPrevValue(0),
+	m_iTargetValue(0),
+	m_fRackingDuration(1.0f),
+	m_fElapsedTimeRack(0.0f),
+	m_uiDenomination(1),
+	m_dTotalDistance(0.0f),
+	m_dPrevDistance(0.0),
+	m_fThresholdDist(0.0f),
 	m_SpinText(this)
 {
 	SetMonospacedDigits(true);
@@ -20,6 +29,15 @@ HyRackMeter::HyRackMeter(HyEntity2d *pParent /*= nullptr*/) :
 
 HyRackMeter::HyRackMeter(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit, HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(panelInit, textInit, pParent),
+	m_iCurValue(0),
+	m_iPrevValue(0),
+	m_iTargetValue(0),
+	m_fRackingDuration(1.0f),
+	m_fElapsedTimeRack(0.0f),
+	m_uiDenomination(1),
+	m_dTotalDistance(0.0f),
+	m_dPrevDistance(0.0),
+	m_fThresholdDist(0.0f),
 	m_SpinText(this)
 {
 	SetMonospacedDigits(true);

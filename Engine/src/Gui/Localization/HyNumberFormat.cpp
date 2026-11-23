@@ -28,6 +28,11 @@ HyNumberFormat::HyNumberFormat()
 	m_uiMaxFraction = 6;
 }
 
+HyNumberFormat::HyNumberFormat(uint32 uiSerialized)
+{
+	Deserialize(uiSerialized);
+}
+
 HyNumberFormat::HyNumberFormat(const HyNumberFormat &copyRef)
 {
 	m_uiDecimalSeparator = copyRef.m_uiDecimalSeparator;
@@ -62,6 +67,34 @@ HyNumberFormat &HyNumberFormat::operator=(const HyNumberFormat &rhs)
 	m_uiMaxFraction = rhs.m_uiMaxFraction;
 
 	return *this;
+}
+
+uint32 HyNumberFormat::Serialize() const
+{
+	return (m_uiDecimalSeparator << 0) |
+		(m_uiSign << 1) |
+		(m_uiGrouping << 4) |
+		(m_uiRounding << 7) |
+		(m_uiUseMinorCurrencySymbol << 10) |
+		(m_uiUseScientificNotation << 11) |
+		(m_uiUseCurrencySymbol << 12) |
+		(m_uiFillIntegerZeros << 13) |
+		(m_uiMinFraction << 20) |
+		(m_uiMaxFraction << 24);
+}
+
+void HyNumberFormat::Deserialize(uint32 uiSerialized)
+{
+	m_uiDecimalSeparator = (uiSerialized >> 0) & 0x1;
+	m_uiSign = (uiSerialized >> 1) & 0x7;
+	m_uiGrouping = (uiSerialized >> 4) & 0x7;
+	m_uiRounding = (uiSerialized >> 7) & 0x7;
+	m_uiUseMinorCurrencySymbol = (uiSerialized >> 10) & 0x1;
+	m_uiUseScientificNotation = (uiSerialized >> 11) & 0x1;
+	m_uiUseCurrencySymbol = (uiSerialized >> 12) & 0x1;
+	m_uiFillIntegerZeros = (uiSerialized >> 13) & 0x7F;
+	m_uiMinFraction = (uiSerialized >> 20) & 0xF;
+	m_uiMaxFraction = (uiSerialized >> 24) & 0xF;
 }
 
 HyNumDecimalSeparator HyNumberFormat::GetDecimalSeparator() const
@@ -109,6 +142,18 @@ HyNumberFormat HyNumberFormat::SetRounding(HyNumFmtRounding eRounding)
 }
 
 // Only used when 'HYFMTROUNDING_None'. Values will clamp to [0-15]
+int32 HyNumberFormat::GetFractionPrecisionMin() const
+{
+	return m_uiMinFraction;
+}
+
+// Only used when 'HYFMTROUNDING_None'. Values will clamp to [0-15]
+int32 HyNumberFormat::GetFractionPrecisionMax() const
+{
+	return m_uiMaxFraction;
+}
+
+// Only used when 'HYFMTROUNDING_None'. Values will clamp to [0-15]
 HyNumberFormat HyNumberFormat::SetFractionPrecision(int32 iMinFractionPlaces /*= 0*/, int32 iMaxFractionPlaces /*= 6*/)
 {
 	m_uiMinFraction = HyMath::Clamp(iMinFractionPlaces, 0, 15);
@@ -147,6 +192,11 @@ HyNumberFormat HyNumberFormat::SetUsingCurrencySymbol(bool bUseCurrencySymbol)
 {
 	m_uiUseCurrencySymbol = bUseCurrencySymbol ? 1 : 0;
 	return *this;
+}
+
+int32 HyNumberFormat::GetIntegerPaddingWidth() const
+{
+	return m_uiFillIntegerZeros;
 }
 
 // Values will clamp to [0-127]

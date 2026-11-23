@@ -971,6 +971,9 @@ void PropertiesTreeModel::ResetValues()
 	case PROPERTIESTYPE_UiPanel:
 		return QVariant(valueRef.toObject());
 
+	case PROPERTIESTYPE_NumberFormat:
+		return QVariant(valueRef.toInteger());
+
 	default:
 		HyGuiLog("Unhandled PropertiesTreeModel::ConvertJsonToVariant property type: " % QString::number(ePropType), LOGTYPE_Error);
 		break;
@@ -1034,6 +1037,9 @@ void PropertiesTreeModel::ResetValues()
 	case PROPERTIESTYPE_ShapeData:
 	case PROPERTIESTYPE_UiPanel:
 		return QJsonValue(valueRef.toJsonObject());
+
+	case PROPERTIESTYPE_NumberFormat:
+		return QJsonValue(static_cast<qint64>(valueRef.toUInt()));
 
 	default:
 		HyGuiLog("Unhandled PropertiesTreeModel::ConvertVariantToJson property type: " % QString::number(ePropType), LOGTYPE_Error);
@@ -1231,6 +1237,10 @@ QString PropertiesTreeModel::ConvertValueToString(TreeModelItem *pTreeItem) cons
 		sRetStr += "Panel";
 		break;
 
+	case PROPERTIESTYPE_NumberFormat:
+		sRetStr += "<formatting>";
+		break;
+
 	default:
 		HyGuiLog("PropertiesTreeModel::ConvertValueToString() - not implemented for type: " % QString::number(propDefRef.eType), LOGTYPE_Error);
 		break;
@@ -1343,6 +1353,10 @@ void PropertiesTreeModel::DeserializeJsonCategory(const QString &sCategory, cons
 			case PROPERTIESTYPE_ShapeData:
 			case PROPERTIESTYPE_UiPanel:
 				propValue = categoryObj[sProperty].toObject();
+				break;
+
+			case PROPERTIESTYPE_NumberFormat:
+				propValue = categoryObj[sProperty].toInteger();
 				break;
 
 			default:

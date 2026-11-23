@@ -544,12 +544,19 @@ void EntityTreeItemData::InitalizePropertyModel()
 
 		if(GetType() != ITEM_UiSlider) // AKA all widgets derived from Label
 		{
-			m_pPropertiesModel->InsertCategory(0, "Label", QVariant(), false, "The main text used in this widget");
+			m_pPropertiesModel->InsertCategory(0, "Label", QVariant(), false, "UI widget that displays text on a panel");
 			m_pPropertiesModel->AppendProperty("Label", "Text Item", PROPERTIESTYPE_ComboBoxItems, QVariant(), "The specified project Text item used on this widget", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), QString(), QString(), ITEM_Text);
 			if(GetType() == ITEM_UiRackMeter)
 			{
-				m_pPropertiesModel->AppendProperty("Label", "Set Value", PROPERTIESTYPE_int64, 0, "The numerical value represented in the rack meter", PROPERTIESACCESS_ToggleUnchecked);
-				// TODO: m_pPropertiesModel->AppendProperty("Label", "Rack Value", PROPERTIESTYPE_int64, 0, "The numerical value represented in the rack meter", PROPERTIESACCESS_ToggleUnchecked);
+				m_pPropertiesModel->InsertCategory(0, "Rack Meter", QVariant(), false, "UI widget that displays a numeric value that can rack to new values");
+				m_pPropertiesModel->AppendProperty("Rack Meter", "Set Value", PROPERTIESTYPE_int64, 0, "The numerical value represented in the rack meter", PROPERTIESACCESS_ToggleUnchecked, -iRANGE, iRANGE, 1);
+				// TODO: m_pPropertiesModel->AppendProperty("Rack Meter", "Rack Value", PROPERTIESTYPE_ivec2, 0, "X: The numerical value represented in the rack meter", PROPERTIESACCESS_ToggleUnchecked);
+
+				m_pPropertiesModel->AppendProperty("Rack Meter", "Show As Cash", PROPERTIESTYPE_bool, false, "Check to format the text as currency/money", PROPERTIESACCESS_ToggleUnchecked);
+				m_pPropertiesModel->AppendProperty("Rack Meter", "Spinning Digits", PROPERTIESTYPE_bool, false, "Check to have digits spin when racking to new values", PROPERTIESACCESS_ToggleUnchecked);
+				m_pPropertiesModel->AppendProperty("Rack Meter", "Number Formatting", PROPERTIESTYPE_NumberFormat, HyNumberFormat().Serialize(), "The number formatting to use when displaying the value", PROPERTIESACCESS_ToggleUnchecked);
+				// TODO: SetNumFormat(HyNumberFormat format);
+				// TODO: SetDenomination(uint32 uiDenom);
 			}
 			else
 			{
@@ -566,14 +573,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 			m_pPropertiesModel->AppendProperty("Label", "Text Visible", PROPERTIESTYPE_bool, Qt::Checked, "Enabled dictates whether this widget's main text gets rendered", PROPERTIESACCESS_ToggleUnchecked);
 			m_pPropertiesModel->AppendProperty("Label", "Alignment", PROPERTIESTYPE_ComboBoxString, HyGlobal::AlignmentName(HYALIGN_Left), "The alignment of the text", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetAlignmentNameList());
 			m_pPropertiesModel->AppendProperty("Label", "Monospaced Digits", PROPERTIESTYPE_bool, false, "Check to use monospaced digits, which ensures all digits use the same width which looks better when racking", PROPERTIESACCESS_ToggleUnchecked);
-			if(GetType() == ITEM_UiRackMeter)
-			{
-				m_pPropertiesModel->AppendProperty("Label", "Show As Cash", PROPERTIESTYPE_bool, false, "Check to format the text as currency/money", PROPERTIESACCESS_ToggleUnchecked);
-				m_pPropertiesModel->AppendProperty("Label", "Spinning Digits", PROPERTIESTYPE_bool, false, "Check to have digits spin when racking to new values", PROPERTIESACCESS_ToggleUnchecked);
-				// TODO: SetNumFormat(HyNumberFormat format);
-				// TODO: SetDenomination(uint32 uiDenom);
-			}
-			else if(GetType() == ITEM_UiButton || GetType() == ITEM_UiCheckBox || GetType() == ITEM_UiRadioButton)
+			if(GetType() == ITEM_UiButton || GetType() == ITEM_UiCheckBox || GetType() == ITEM_UiRadioButton)
 			{
 				m_pPropertiesModel->InsertCategory(0, "Button", QVariant(), false, "A button is a label that can be depressed");
 				m_pPropertiesModel->AppendProperty("Button", "Checked", PROPERTIESTYPE_bool, Qt::Unchecked, "Sets this button as 'checked'", PROPERTIESACCESS_ToggleUnchecked);
@@ -584,7 +584,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 				m_pPropertiesModel->AppendProperty("Bar Meter", "Min Value", PROPERTIESTYPE_int, 0, "The minimum, clamped value that indicates the bar is empty", PROPERTIESACCESS_ToggleUnchecked, -iRANGE, iRANGE, 1);
 				m_pPropertiesModel->AppendProperty("Bar Meter", "Max Value", PROPERTIESTYPE_int, 0, "The maximum, clamped value that indicates the bar is full", PROPERTIESACCESS_ToggleUnchecked, -iRANGE, iRANGE, 1);
 				m_pPropertiesModel->AppendProperty("Bar Meter", "Value", PROPERTIESTYPE_int, 0, "The current bar meter's value, clamped to the Min and Max values", PROPERTIESACCESS_ToggleUnchecked, -iRANGE, iRANGE, 1);
-				// TODO: SetNumFormat(HyNumberFormat format);
+				m_pPropertiesModel->AppendProperty("Bar Meter", "Number Formatting", PROPERTIESTYPE_NumberFormat, HyNumberFormat().Serialize(), "The number formatting to use when displaying the value", PROPERTIESACCESS_ToggleUnchecked);
 			}
 
 			m_pPropertiesModel->InsertCategory(1, "Panel", QVariant(), false, "The main visual background portion of this widget");

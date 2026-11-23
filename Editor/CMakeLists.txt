@@ -261,6 +261,9 @@ if(Qt6_DIR)
 		src/Dialogs/DlgInputNumber.cpp
 		src/Dialogs/DlgInputNumber.h
 		src/Dialogs/DlgInputNumber.ui
+		src/Dialogs/DlgNumberFormat.cpp
+		src/Dialogs/DlgNumberFormat.h
+		src/Dialogs/DlgNumberFormat.ui
 		src/Dialogs/DlgSetEngineLocation.cpp
 		src/Dialogs/DlgSetEngineLocation.h
 		src/Dialogs/DlgSetEngineLocation.ui

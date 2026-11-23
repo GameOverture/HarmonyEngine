@@ -19,6 +19,7 @@
 #include "Project.h"
 #include "DlgColorPicker.h"
 #include "DlgSetUiPanel.h"
+#include "DlgNumberFormat.h"
 #include "EntityTreeModel.h"
 #include "EntityDraw.h"
 
@@ -356,6 +357,27 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 		if(pDlg->exec() == QDialog::Accepted)
 		{
 			QVariant newValue = DlgSetUiPanel::SerializePanelInit(pDlg->GetPanelInit(), pDlg->GetNodeUuid());
+			if(origValue != newValue)
+			{
+				QUndoCommand *pUndoCmd = pPropertiesTreeModel->AllocateUndoCmd(index, newValue);
+				if(pPropertiesTreeModel->GetUndoStack())
+					pPropertiesTreeModel->GetUndoStack()->push(pUndoCmd);
+				else
+				{
+					pUndoCmd->redo();
+					delete pUndoCmd;
+				}
+			}
+		}
+		break; }
+
+	case PROPERTIESTYPE_NumberFormat: {
+		const QVariant &origValue = pPropertiesTreeModel->GetIndexValue(index);
+		DlgNumberFormat *pDlg = new DlgNumberFormat("Set Number Format", origValue.toUInt());
+		if(pDlg->exec() == QDialog::Accepted)
+		{
+			pDlg->SyncFormatToWidgets();
+			QVariant newValue = QVariant(pDlg->GetNumberFormat().Serialize());
 			if(origValue != newValue)
 			{
 				QUndoCommand *pUndoCmd = pPropertiesTreeModel->AllocateUndoCmd(index, newValue);

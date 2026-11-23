@@ -52,6 +52,7 @@ enum PropertiesType
 	PROPERTIESTYPE_TileMapLayerData,// QJsonObject { "tilesets": QJsonArray, "tileLayer": QJsonObject }
 	PROPERTIESTYPE_ShapeData,		// QJsonObject { "type": "Circle"/"Polygon"/"Chain/...", "data": QJsonArray of floats, "outline": 0.0 }
 	PROPERTIESTYPE_UiPanel,			// QJsonObject
+	PROPERTIESTYPE_NumberFormat,	// uint32
 };
 
 enum PropertiesAccessType

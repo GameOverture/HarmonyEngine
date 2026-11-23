@@ -1535,8 +1535,6 @@ QString EntityModel::GenerateSrc_SetProperties(bool &bVertListDeclaredRef, Entit
 		{
 			QJsonObject labelObj = propObj["Label"].toObject();
 
-			if(labelObj.contains("Set Value")) // HyRackMeter
-				sSrc += sCodeName + "SetValue(" + QString::number(labelObj["Set Value"].toInt()) + ", 0.0f);" + sNewLine;
 			if(labelObj.contains("Text"))
 				sSrc += sCodeName + "SetText(\"" + labelObj["Text"].toString() + "\");" + sNewLine;
 			if(labelObj.contains("Input Validator"))
@@ -1588,10 +1586,6 @@ QString EntityModel::GenerateSrc_SetProperties(bool &bVertListDeclaredRef, Entit
 			}
 			if(labelObj.contains("Monospaced Digits"))
 				sSrc += sCodeName + "SetMonospacedDigits(" + (labelObj["Monospaced Digits"].toBool() ? "true" : "false") + ");" + sNewLine;
-			if(labelObj.contains("Show As Cash"))
-				sSrc += sCodeName + "ShowAsCash(" + (labelObj["Show As Cash"].toBool() ? "true" : "false") + ");" + sNewLine;
-			if(labelObj.contains("Spinning Digits"))
-				sSrc += sCodeName + "SetAsSpinningMeter(" + (labelObj["Spinning Digits"].toBool() ? "true" : "false") + ");" + sNewLine;
 			// TODO: SetNumFormat(HyNumberFormat format);
 			// TODO: SetDenomination(uint32 uiDenom);
 
@@ -1602,6 +1596,19 @@ QString EntityModel::GenerateSrc_SetProperties(bool &bVertListDeclaredRef, Entit
 			if(buttonObj.contains("Checked"))
 				sSrc += sCodeName + "SetChecked(" + (buttonObj["Checked"].toBool() ? "true" : "false") + ");" + sNewLine;
 		}
+		else if(sCategoryName == "Rack Meter")
+		{
+			QJsonObject rackMeterObj = propObj["Rack Meter"].toObject();
+
+			if(rackMeterObj.contains("Set Value"))
+				sSrc += sCodeName + "SetValue(" + QString::number(rackMeterObj["Set Value"].toInt()) + ", 0.0f);" + sNewLine;
+			if(rackMeterObj.contains("Show As Cash"))
+				sSrc += sCodeName + "ShowAsCash(" + (rackMeterObj["Show As Cash"].toBool() ? "true" : "false") + ");" + sNewLine;
+			if(rackMeterObj.contains("Spinning Digits"))
+				sSrc += sCodeName + "SetAsSpinningMeter(" + (rackMeterObj["Spinning Digits"].toBool() ? "true" : "false") + ");" + sNewLine;
+			if(rackMeterObj.contains("Number Formatting"))
+				sSrc += sCodeName + "SetNumFormat(HyNumberFormat(" + QString::number(rackMeterObj["Number Formatting"].toInteger()) + "));" + sNewLine;
+		}
 		else if(sCategoryName == "Bar Meter")
 		{
 			QJsonObject barMeterObj = propObj["Bar Meter"].toObject();
@@ -1611,7 +1618,8 @@ QString EntityModel::GenerateSrc_SetProperties(bool &bVertListDeclaredRef, Entit
 				sSrc += sCodeName + "SetMaximum(" + QString::number(barMeterObj["Max Value"].toInt()) + ");" + sNewLine;
 			if(barMeterObj.contains("Value"))
 				sSrc += sCodeName + "SetValue(" + QString::number(barMeterObj["Value"].toInt()) + ");" + sNewLine;
-			// TODO: SetNumFormat(HyNumberFormat format);
+			if(barMeterObj.contains("Number Formatting"))
+				sSrc += sCodeName + "SetNumFormat(HyNumberFormat(" + QString::number(barMeterObj["Number Formatting"].toInteger()) + "));" + sNewLine;
 		}
 		else if(sCategoryName == "Slider")
 		{

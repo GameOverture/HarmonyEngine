@@ -26,20 +26,20 @@ protected:
 	};
 	static_assert((int)RACKMETERATTRIB_IsSpinDigits == (int)LABELATTRIB_NEXTFLAG, "HyRackMeter is not matching with base classes attrib flags");
 
-	int64								m_iCurValue = 0;
-	int64								m_iPrevValue = 0;
-	int64								m_iTargetValue = 0;
+	int64								m_iCurValue;
+	int64								m_iPrevValue;
+	int64								m_iTargetValue;
 
-	float								m_fRackingDuration = 1.0f;
-	float								m_fElapsedTimeRack = 0.0f;
+	float								m_fRackingDuration;
+	float								m_fElapsedTimeRack;
 
 	HyNumberFormat						m_NumberFormat;
-	uint32								m_uiDenomination = 1;
+	uint32								m_uiDenomination;
 
 	// Spin digits member variables
-	double								m_dTotalDistance = 0.0f;
-	double								m_dPrevDistance = 0.0;
-	float								m_fThresholdDist = 0.0f;
+	double								m_dTotalDistance;
+	double								m_dPrevDistance;
+	float								m_fThresholdDist;
 
 	class SpinText : public HyEntity2d
 	{
