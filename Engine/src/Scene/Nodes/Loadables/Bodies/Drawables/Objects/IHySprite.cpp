@@ -24,7 +24,8 @@ IHySprite<NODETYPE, ENTTYPE>::IHySprite(const HyNodePath &nodePath, ENTTYPE *pPa
 	m_fAnimPlayRate(1.0f),
 	m_fElapsedFrameTime(0.0f),
 	m_uiCurFrame(0),
-	m_vTextureTiling(1.0f, 1.0f)
+	m_vTextureTiling(1.0f, 1.0f),
+	m_vTextureOffset(0.0f, 0.0f)
 {
 	this->m_ShaderUniforms.SetNumTexUnits(1);
 }
@@ -36,7 +37,8 @@ IHySprite<NODETYPE, ENTTYPE>::IHySprite(const IHySprite &copyRef) :
 	m_fAnimPlayRate(copyRef.m_fAnimPlayRate),
 	m_fElapsedFrameTime(copyRef.m_fElapsedFrameTime),
 	m_uiCurFrame(copyRef.m_uiCurFrame),
-	m_vTextureTiling(1.0f, 1.0f)
+	m_vTextureTiling(1.0f, 1.0f),
+	m_vTextureOffset(0.0f, 0.0f)
 {
 	for(uint32 i = 0; i < static_cast<uint32>(copyRef.m_AnimCtrlAttribList.size()); ++i)
 		m_AnimCtrlAttribList.push_back(copyRef.m_AnimCtrlAttribList[i]);
@@ -634,6 +636,18 @@ template<typename NODETYPE, typename ENTTYPE>
 void IHySprite<NODETYPE, ENTTYPE>::SetTextureTiling(glm::vec2 vTileDimensions)
 {
 	m_vTextureTiling = vTileDimensions;
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+glm::vec2 IHySprite<NODETYPE, ENTTYPE>::GetTextureOffset() const
+{
+	return m_vTextureOffset;
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+void IHySprite<NODETYPE, ENTTYPE>::SetTextureOffset(glm::vec2 vTileOffset)
+{
+	m_vTextureOffset = vTileOffset;
 }
 
 template<typename NODETYPE, typename ENTTYPE>

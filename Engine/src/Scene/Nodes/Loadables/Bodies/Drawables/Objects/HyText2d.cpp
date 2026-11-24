@@ -186,6 +186,9 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 
 			vertexBufferRef.AppendVertexData(&vSize, sizeof(glm::vec2));
 			vertexBufferRef.AppendVertexData(&vSize, sizeof(glm::vec2)); // Texel density always matches size - Text doesn't support texture tiling
+			glm::vec2 vTextureOffset(0.0f, 0.0f);
+			vertexBufferRef.AppendVertexData(&vTextureOffset, sizeof(glm::vec2));// Texel offset
+			
 			vertexBufferRef.AppendVertexData(&vOffset, sizeof(glm::vec2));
 
 			glm::vec3 vTopColor = m_StateColors[m_uiState]->m_LayerColors[i]->topClr.GetAsVec3();

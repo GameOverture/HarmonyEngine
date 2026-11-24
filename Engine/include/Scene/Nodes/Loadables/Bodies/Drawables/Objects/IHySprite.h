@@ -41,6 +41,7 @@ protected:
 	uint32					m_uiCurFrame;
 
 	glm::vec2				m_vTextureTiling;
+	glm::vec2				m_vTextureOffset;
 
 public:
 	IHySprite(const HyNodePath &nodePath, ENTTYPE *pParent);
@@ -100,6 +101,8 @@ public:
 
 	glm::vec2 GetTextureTiling() const;
 	void SetTextureTiling(glm::vec2 vTileDimensions);
+	glm::vec2 GetTextureOffset() const;
+	void SetTextureOffset(glm::vec2 vTileOffset);
 
 	virtual bool SetState(uint32 uiStateIndex) override;
 	virtual bool IsLoadDataValid() override;

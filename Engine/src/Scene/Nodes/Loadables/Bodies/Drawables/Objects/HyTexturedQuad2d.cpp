@@ -17,14 +17,16 @@
 
 HyTexturedQuad2d::HyTexturedQuad2d(HyEntity2d *pParent /*= nullptr*/) :
 	IHyDrawable2d(HYTYPE_TexturedQuad, HyNodePath(), pParent),
-	m_vTextureTiling(1.0f, 1.0f)
+	m_vTextureTiling(1.0f, 1.0f),
+	m_vTextureOffset(0.0f, 0.0f)
 {
 	m_ShaderUniforms.SetNumTexUnits(1);
 }
 
 HyTexturedQuad2d::HyTexturedQuad2d(const HyNodePath &nodePath, HyEntity2d *pParent /*= nullptr*/) :
 	IHyDrawable2d(HYTYPE_TexturedQuad, nodePath, pParent),
-	m_vTextureTiling(1.0f, 1.0f)
+	m_vTextureTiling(1.0f, 1.0f),
+	m_vTextureOffset(0.0f, 0.0f)
 {
 	m_ShaderUniforms.SetNumTexUnits(1);
 
@@ -38,21 +40,24 @@ HyTexturedQuad2d::HyTexturedQuad2d(const HyNodePath &nodePath, HyEntity2d *pPare
 
 HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasFrameChecksum, uint32 uiBankId, HyEntity2d *pParent /*= nullptr*/) :
 	IHyDrawable2d(HYTYPE_TexturedQuad, HyNodePath(uiAtlasFrameChecksum, uiBankId), pParent),
-	m_vTextureTiling(1.0f, 1.0f)
+	m_vTextureTiling(1.0f, 1.0f),
+	m_vTextureOffset(0.0f, 0.0f)
 {
 	m_ShaderUniforms.SetNumTexUnits(1);
 }
 
 HyTexturedQuad2d::HyTexturedQuad2d(HyTextureQuadHandle hTextureQuadHandle, HyEntity2d *pParent /*= nullptr*/) :
 	IHyDrawable2d(HYTYPE_TexturedQuad, HyNodePath(hTextureQuadHandle.first, hTextureQuadHandle.second), pParent),
-	m_vTextureTiling(1.0f, 1.0f)
+	m_vTextureTiling(1.0f, 1.0f),
+	m_vTextureOffset(0.0f, 0.0f)
 {
 	m_ShaderUniforms.SetNumTexUnits(1);
 }
 
 HyTexturedQuad2d::HyTexturedQuad2d(std::string sFilePath, HyImageInfo imageInfo, HyTextureInfo textureInfo, HyEntity2d *pParent /*= nullptr*/) :
 	IHyDrawable2d(HYTYPE_TexturedQuad, HyNodePath(), pParent),
-	m_vTextureTiling(1.0f, 1.0f)
+	m_vTextureTiling(1.0f, 1.0f),
+	m_vTextureOffset(0.0f, 0.0f)
 {
 	m_ShaderUniforms.SetNumTexUnits(1);
 
@@ -62,7 +67,8 @@ HyTexturedQuad2d::HyTexturedQuad2d(std::string sFilePath, HyImageInfo imageInfo,
 
 HyTexturedQuad2d::HyTexturedQuad2d(const HyTexturedQuad2d &copyRef) :
 	IHyDrawable2d(copyRef),
-	m_vTextureTiling(1.0f, 1.0f)
+	m_vTextureTiling(1.0f, 1.0f),
+	m_vTextureOffset(0.0f, 0.0f)
 {
 	m_ShaderUniforms.SetNumTexUnits(1);
 }
@@ -175,6 +181,16 @@ void HyTexturedQuad2d::SetTextureTiling(glm::vec2 vTileDimensions)
 	m_vTextureTiling = vTileDimensions;
 }
 
+glm::vec2 HyTexturedQuad2d::GetTextureOffset() const
+{
+	return m_vTextureOffset;
+}
+
+void HyTexturedQuad2d::SetTextureOffset(glm::vec2 vTileOffset)
+{
+	m_vTextureOffset = vTileOffset;
+}
+
 /*virtual*/ bool HyTexturedQuad2d::IsLoadDataValid() /*override*/
 {
 	const HyTexturedQuadData *pData = static_cast<const HyTexturedQuadData *>(AcquireData());
@@ -242,8 +258,9 @@ void HyTexturedQuad2d::SetTextureTiling(glm::vec2 vTileDimensions)
 	glm::vec2 vSize(m_UvCoords.Width() * pData->GetAtlas()->GetWidth(), m_UvCoords.Height() * pData->GetAtlas()->GetHeight());
 
 	glm::vec2 vQuadSize = vSize * m_vTextureTiling;
-	vertexBufferRef.AppendVertexData(&vQuadSize, sizeof(glm::vec2));	// Quad size
-	vertexBufferRef.AppendVertexData(&vSize, sizeof(glm::vec2));		// Texel density
+	vertexBufferRef.AppendVertexData(&vQuadSize, sizeof(glm::vec2));		// Quad size
+	vertexBufferRef.AppendVertexData(&vSize, sizeof(glm::vec2));			// Texel density
+	vertexBufferRef.AppendVertexData(&m_vTextureOffset, sizeof(glm::vec2));	// Texel offset
 
 	glm::vec2 vOffset(0.0f, 0.0f);
 	vOffset = vSize * -0.5f; // Offset the vertices so that the center of the quad is at the node's position, instead of the top-left corner

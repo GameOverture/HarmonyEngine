@@ -137,8 +137,9 @@ void HySprite2d::SetAnimCallback(uint32 uiStateIndex, std::function<void(HySprit
 	glm::vec2 vSize(pFrameRef->rSRC_RECT.Width() * pFrameRef->pAtlas->GetWidth(), pFrameRef->rSRC_RECT.Height() * pFrameRef->pAtlas->GetHeight());
 
 	glm::vec2 vQuadSize = vSize * m_vTextureTiling;
-	vertexBufferRef.AppendVertexData(&vQuadSize, sizeof(glm::vec2));	// Quad size
-	vertexBufferRef.AppendVertexData(&vSize, sizeof(glm::vec2));		// Texel density
+	vertexBufferRef.AppendVertexData(&vQuadSize, sizeof(glm::vec2));		// Quad size
+	vertexBufferRef.AppendVertexData(&vSize, sizeof(glm::vec2));			// Texel density
+	vertexBufferRef.AppendVertexData(&m_vTextureOffset, sizeof(glm::vec2));	// Texel offset
 
 	glm::vec2 vOffset(pFrameRef->vOFFSET.x, pFrameRef->vOFFSET.y);
 	vertexBufferRef.AppendVertexData(&vOffset, sizeof(glm::vec2));

@@ -396,6 +396,7 @@ HyOpenGL::~HyOpenGL(void)
 			pShader->SetSourceCodePtrs({szHYQUADBATCH_VERTEXSHADER}, HYSHADER_Vertex);
 			pShader->AddVertexAttribute("attr_size", HyShaderVariable::vec2, false, 1);
 			pShader->AddVertexAttribute("attr_texel_density", HyShaderVariable::vec2, false, 1);
+			pShader->AddVertexAttribute("attr_texel_offset", HyShaderVariable::vec2, false, 1);
 			pShader->AddVertexAttribute("attr_offset", HyShaderVariable::vec2, false, 1);
 			pShader->AddVertexAttribute("attr_top_tint", HyShaderVariable::vec4, false, 1);
 			pShader->AddVertexAttribute("attr_bot_tint", HyShaderVariable::vec4, false, 1);

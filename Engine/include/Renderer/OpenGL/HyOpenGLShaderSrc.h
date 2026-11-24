@@ -20,18 +20,9 @@ const char * const szHYQUADBATCH_VERTEXSHADER = R"src(
 uniform mat4					u_view_mtx;
 uniform mat4					u_projection_mtx;
 
-//layout(location = 0) in vec2	attr_size;
-//layout(location = 1) in vec2	attr_offset;
-//layout(location = 2) in vec4	attr_top_tint;
-//layout(location = 3) in vec4	attr_bot_tint;
-//layout(location = 4) in vec2	attr_uv0;
-//layout(location = 5) in vec2	attr_uv1;
-//layout(location = 6) in vec2	attr_uv2;
-//layout(location = 7) in vec2	attr_uv3;
-//layout(location = 8) in mat4	attr_transform_mtx;
-
 attribute vec2					attr_size;
 attribute vec2					attr_texel_density; // Typically matches attr_size to fully cover the quad, but will wrap/crop the sampled texture otherwise
+attribute vec2					attr_texel_offset;
 attribute vec2					attr_offset;
 attribute vec4					attr_top_tint;
 attribute vec4					attr_bot_tint;
@@ -45,6 +36,7 @@ smooth out vec2					interp_position;
 smooth out vec4					interp_color;
 
 flat out vec2					interp_texel_ratio;
+flat out vec2					interp_texel_offset;
 
 flat out vec2					interp_uv0;
 flat out vec2					interp_uv1;
@@ -67,6 +59,7 @@ void main()
 	interp_color = g_vCOLORS[gl_VertexID];
 
 	interp_texel_ratio = attr_size / attr_texel_density;
+	interp_texel_offset = attr_texel_offset;
 
 	interp_uv0 = attr_uv0;
 	interp_uv1 = attr_uv1;
@@ -92,6 +85,7 @@ smooth in vec2					interp_position;
 smooth in vec4					interp_color;
 
 flat in vec2					interp_texel_ratio;
+flat in vec2					interp_texel_offset;
 
 flat in vec2					interp_uv0;
 flat in vec2					interp_uv1;
@@ -102,7 +96,7 @@ out vec4						out_color;
 
 void main()
 {
-	vec2 tiled_uv = fract(interp_position * interp_texel_ratio);
+	vec2 tiled_uv = fract((interp_position * interp_texel_ratio) + interp_texel_offset);
 
 	vec2 uv_top = mix(interp_uv1, interp_uv0, tiled_uv.x);
 	vec2 uv_bottom = mix(interp_uv3, interp_uv2, tiled_uv.x);

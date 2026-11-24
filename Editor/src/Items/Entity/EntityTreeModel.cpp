@@ -1319,10 +1319,15 @@ QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::Di
 			if(dataVal.isUndefined() == false && dataVal.isNull() == false)
 			{
 				if(dataVal.isObject() == false)
-					HyGuiLog("EntityTreeModel::data() - PrimLayer/Fixture 'Data' property is not a JSON object", LOGTYPE_Error);
+				{
+					//HyGuiLog("EntityTreeModel::data() - PrimLayer/Fixture 'Data' property is not a JSON object", LOGTYPE_Error);
+					QJsonValue::Type eType = dataVal.type();
+					sIconUrl += "icon.png";
+					return QVariant(QIcon(sIconUrl));
+				}
 
 				QJsonObject shapeDataObj = dataVal.toObject();
-
+				
 				QString sType = shapeDataObj["type"].toString();
 				if(sType.compare(HYLINECHAIN_Name) == 0)
 					sIconUrl += "lineChain.png";
