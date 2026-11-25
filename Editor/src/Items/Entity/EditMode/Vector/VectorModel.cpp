@@ -1871,22 +1871,32 @@ void VectorModel::DoTransformCreation(bool bCtrlHeld, bool bShiftHeld, float fSn
 			//m_eShapeType = SHAPE_Box;
 			//[[fallthrough]];
 		case SHAPE_Box: {
+
+			// Ensure ptLowerBound and ptUpperBound are still correct
+			if(ptLowerBound.x > ptUpperBound.x)
+				std::swap(ptLowerBound.x, ptUpperBound.x);
+			if(ptLowerBound.y > ptUpperBound.y)
+				std::swap(ptLowerBound.y, ptUpperBound.y);
+
 			static_cast<HyShape2d *>(m_pFixture)->SetAsBox(HyRect((ptUpperBound.x - ptLowerBound.x) * 0.5f, (ptUpperBound.y - ptLowerBound.y) * 0.5f, ptCenter, 0.0f));
 			m_GrabPointList.clear();
 			std::vector<glm::vec2> fixtureGrabPoints = m_pFixture->CalcGrabPoints();
 
-			std::vector<glm::vec2> boxGrabPoints;
-			boxGrabPoints.reserve(8);
-			boxGrabPoints.emplace_back(fixtureGrabPoints[0]);
-			boxGrabPoints.emplace_back((fixtureGrabPoints[0] + fixtureGrabPoints[1]) * 0.5f);
-			boxGrabPoints.emplace_back(fixtureGrabPoints[1]);
-			boxGrabPoints.emplace_back((fixtureGrabPoints[1] + fixtureGrabPoints[2]) * 0.5f);
-			boxGrabPoints.emplace_back(fixtureGrabPoints[2]);
-			boxGrabPoints.emplace_back((fixtureGrabPoints[2] + fixtureGrabPoints[3]) * 0.5f);
-			boxGrabPoints.emplace_back(fixtureGrabPoints[3]);
-			boxGrabPoints.emplace_back((fixtureGrabPoints[3] + fixtureGrabPoints[0]) * 0.5f);
-			for(glm::vec2 &ptGrab : boxGrabPoints)
-				m_GrabPointList.append(GfxGrabPointModel(GRABPOINT_Endpoint, ptGrab));
+			if(fixtureGrabPoints.empty() == false)
+			{
+				std::vector<glm::vec2> boxGrabPoints;
+				boxGrabPoints.reserve(8);
+				boxGrabPoints.emplace_back(fixtureGrabPoints[0]);
+				boxGrabPoints.emplace_back((fixtureGrabPoints[0] + fixtureGrabPoints[1]) * 0.5f);
+				boxGrabPoints.emplace_back(fixtureGrabPoints[1]);
+				boxGrabPoints.emplace_back((fixtureGrabPoints[1] + fixtureGrabPoints[2]) * 0.5f);
+				boxGrabPoints.emplace_back(fixtureGrabPoints[2]);
+				boxGrabPoints.emplace_back((fixtureGrabPoints[2] + fixtureGrabPoints[3]) * 0.5f);
+				boxGrabPoints.emplace_back(fixtureGrabPoints[3]);
+				boxGrabPoints.emplace_back((fixtureGrabPoints[3] + fixtureGrabPoints[0]) * 0.5f);
+				for(glm::vec2 &ptGrab : boxGrabPoints)
+					m_GrabPointList.append(GfxGrabPointModel(GRABPOINT_Endpoint, ptGrab));
+			}
 			break; }
 
 		case SHAPE_Circle: {

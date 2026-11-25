@@ -299,7 +299,7 @@ void IDraw::UpdateDrawStatus()
 	glm::vec2 ptWorldMousePos;
 	m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), ptWorldMousePos);
 
-	if(pHarmonyWidget->IsShowRulersMouse())
+	if(pHarmonyWidget->IsShowRulersMouse() || GetCurAction() == HYACTION_ManipGuideHorz || GetCurAction() == HYACTION_ManipGuideVert)
 		MainWindow::SetDrawStatus("X: " % QString::number(floor(ptWorldMousePos.x)) % "  Y: " % QString::number(floor(ptWorldMousePos.y)), m_sZoomStatus);
 	else
 		MainWindow::SetDrawStatus("", m_sZoomStatus);
@@ -531,6 +531,7 @@ bool IDraw::TryAllocateGuide(HyOrientation eOrientation, int iWorldPos)
 		m_PendingGuide.SetAsLineSegment(0, glm::vec2(0.0f, ptMousePos.y),
 										glm::vec2(static_cast<float>(vRendererSize.x), ptMousePos.y), 1.0f);
 		m_PendingGuide.SetVisible(true);
+		UpdateDrawStatus();
 		break; }
 
 	case HYACTION_ManipGuideVert: {
@@ -540,6 +541,7 @@ bool IDraw::TryAllocateGuide(HyOrientation eOrientation, int iWorldPos)
 		m_PendingGuide.SetAsLineSegment(0, glm::vec2(ptMousePos.x, 0.0f),
 										glm::vec2(ptMousePos.x, static_cast<float>(vRendererSize.y)), 1.0f);
 		m_PendingGuide.SetVisible(true);
+		UpdateDrawStatus();
 		break; }
 
 	default:
